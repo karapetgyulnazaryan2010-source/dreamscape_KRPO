@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreamscape — Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-overlay"></div>
+    <header class="navbar">
+        <div class="logo" style="cursor: pointer;" onclick="window.location.href='index.html'">
+            <div class="logo-moon">☾</div>
+            <div>
+                <h2>Dreamscape Admin</h2>
+                <span>Manage your community</h2>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="#" class="active">Users</a>
+        </nav>
+    </header>
+
+    <main class="auth-page">
+        <div class="auth-card" style="width: 80%; max-width: 800px;">
+            <p class="small-title">ADMIN CONTROL</p>
+            <h1 class="auth-title">User Management</h1>
+            <p class="auth-subtitle">View and manage all registered users of Dreamscape.</p>
+
+            <div id="userList" class="admin-user-list" style="margin-top: 30px; text-align: left; width: 100%;">
+                <!-- Users will be loaded here -->
+                <p style="text-align: center; opacity: 0.6;">Loading users...</p>
+            </div>
+        </div>
+    </main>
+
+    <style>
+        .admin-user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .user-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .user-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: white;
+        }
+        .user-email {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        .user-role {
+            background: #6c5ce7;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 0.7rem;
+            margin-left: 10px;
+            text-transform: uppercase;
+        }
+        .delete-btn {
+            background: #ff7675;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .delete-btn:hover {
+            background: #d63031;
+        }
+    </style>
+    <script src="env-config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

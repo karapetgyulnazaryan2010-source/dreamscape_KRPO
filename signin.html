@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreamscape — Sign In</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-overlay"></div>
+
+    <header class="navbar">
+        <div class="logo" style="cursor: pointer;" onclick="window.location.href='index.html'">
+            <div class="logo-moon">☾</div>
+            <div>
+                <h2>Dreamscape</h2>
+                <span>Explore your dreams</span>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="index.html#analyzer">Interpret dreams</a>
+            <a href="index.html#dictionary">DreamDictionary</a>
+            <a href="index.html#saved">My Dreams</a>
+            <a href="#" class="active">Sign In</a>
+        </nav>
+    </header>
+
+    <main class="auth-page">
+        <div class="auth-card">
+            <div class="result-icon">☾</div>
+            <p class="small-title">WELCOME BACK</p>
+            <h1 class="auth-title">Sign In to Dreamscape</h1>
+            <p class="auth-subtitle">Welcome back! Please enter your details to access your dream journal.</p>
+
+            <form class="auth-form" id="signinForm">
+                <label class="auth-label" for="email">Email</label>
+                <input class="auth-input" type="email" id="email" placeholder="you@example.com" required>
+
+                <label class="auth-label" for="password">Password</label>
+                <input class="auth-input" type="password" id="password" placeholder="Enter your password" required>
+
+                <button type="submit" class="main-button full-width">Sign In</button>
+            </form>
+
+            <div class="auth-divider"><span>or</span></div>
+            <button type="button" class="secondary-button full-width">✦ Continue with Google</button>
+
+            <p class="auth-footer-text">
+                Don't have an account? <a href="signup.html">Sign up here</a>
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-logo">☾ Dreamscape</div>
+        <p>Explore the world hidden inside your dreams.</p>
+        <span>© 2026 Dreamscape</span>
+    </footer>
+
+    <script src="env-config.js"></script>
+<script src="signin_v2.js"></script>
+</body>
+</html>

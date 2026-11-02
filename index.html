@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dreamscape</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Background -->
+    <div class="background-overlay"></div>
+
+    <!-- NAVIGATION -->
+    <header class="navbar">
+
+        <div class="logo" style="cursor: pointer;" onclick="window.location.href='index.html'">
+            <div class="logo-moon">☾</div>
+
+            <div>
+                <h2>Dreamscape</h2>
+                <span>Explore your dreams</span>
+            </div>
+        </div>
+
+        <nav id="mainNav">
+            <a href="#home" class="active">Home</a>
+            <a href="#analyzer" class="nav-link">Interpret dreams</a>
+            <a href="#dictionary" class="nav-link">DreamDictionary</a>
+            <a href="#saved" class="nav-link">My Dreams</a>
+            <a href="login.html" id="authLink">Login</a>
+        </nav>
+
+    </header>
+
+
+    <!-- HOME -->
+    <main id="home">
+
+        <section id="analyzer" class="hero">
+
+            <div class="hero-content">
+
+                <h1>
+                    Tell Me About
+                    <span>Your Dreams?</span>
+                </h1>
+
+                <p class="hero-description">
+                    Share what you dreamed about, and I'll help you find
+                    possible meaning and interpretations. Every dream has a story...
+                </p>
+
+                <div class="analyzer-box" style="position: relative;">
+
+                    <textarea
+                        id="dreamInput"
+                        maxlength="500"
+                        placeholder="Describe your dream in detail. Include any recurring characters, places, or emotions you felt. For example: &quot;I was flying over a city and felt free and happy...&quot;"
+                    ></textarea>
+
+                    <button id="analyzeButton" class="main-button full-width">
+                        Decode My Dream
+                    </button>
+
+                    <!-- LOGIN OVERLAY -->
+                    <div id="loginOverlay" class="result-box hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20, 20, 30, 0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; text-align: center; border-radius: 20px; padding: 20px; box-sizing: border-box;">
+                        <div class="result-icon" style="font-size: 2rem;">☾</div>
+                        <h2 style="margin: 10px 0;">Login to Continue</h2>
+                        <p style="margin-bottom: 20px; opacity: 0.8;">Please sign in to decode your dreams and save them to your journal.</p>
+                        <button onclick="window.location.href='login.html'" class="main-button" style="width: auto; padding: 10px 30px;">Go to Login</button>
+                        <button id="closeOverlay" class="secondary-button" style="margin-top: 15px; background: transparent; border: none; cursor: pointer; color: white; text-decoration: underline;">Maybe later</button>
+                    </div>
+
+                </div>
+
+                <!-- RESULT -->
+
+                <div id="resultBox" class="result-box hidden">
+
+                    <div class="result-icon">
+                        ✦
+                    </div>
+
+                    <p class="small-title">YOUR DREAM INTERPRETATION</p>
+
+                    <h2 id="resultTitle">
+                        Your Dream
+                    </h2>
+
+                    <div id="detectedSymbols" class="symbols"></div>
+
+                    <p id="resultText"></p>
+
+                    <div class="result-disclaimer">
+                        ✦ Dream interpretations are symbolic and for entertainment
+                        and self-reflection. They are not scientific predictions.
+                    </div>
+
+                    <button id="saveDreamButton" class="secondary-button">
+                        ♡ Save This Dream
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- COMMUNITY DREAMS -->
+
+        <section class="community-section">
+
+            <div class="section-header">
+                <span class="section-icon"><img src="people-icon.png" alt="Community"></span>
+                <h2>Community Dreams</h2>
+            </div>
+
+
+            <div class="dream-cards">
+
+                <div class="dream-card">
+
+                    <div class="dream-image flying">
+                        <img src="icon-cloud.png" alt="Cloud">
+                    </div>
+
+                    <div class="card-content">
+
+                        <div class="card-title">
+                            <h3>Flying</h3>
+                            <span>😊 Happy</span>
+                        </div>
+
+                        <p>
+                            Flying through a bright sky and feeling completely free...
+                        </p>
+
+                        <div class="card-footer">
+                            <span>2 hours ago</span>
+                            <button class="like-button" data-likes="24">
+                                <span class="heart-icon">♡</span>
+                                <span class="like-count">24</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="dream-card">
+
+                    <div class="dream-image snake">
+                        <img src="icon-snake.png" alt="Snake">
+                    </div>
+
+                    <div class="card-content">
+
+                        <div class="card-title">
+                            <h3>Snake</h3>
+                            <span>😨 Scared</span>
+                        </div>
+
+                        <p>
+                            I saw a huge snake watching me from the forest...
+                        </p>
+
+                        <div class="card-footer">
+                            <span>5 hours ago</span>
+                            <button class="like-button" data-likes="18">
+                                <span class="heart-icon">♡</span>
+                                <span class="like-count">18</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="dream-card">
+
+                    <div class="dream-image house">
+                        <img src="icon-house.png" alt="House">
+                    </div>
+
+                    <div class="card-content">
+
+                        <div class="card-title">
+                            <h3>Old House</h3>
+                            <span>😌 Calm</span>
+                        </div>
+
+                        <p>
+                            I walked through a house that looked familiar...
+                        </p>
+
+                        <div class="card-footer">
+                            <span>Yesterday</span>
+                            <button class="like-button" data-likes="31">
+                                <span class="heart-icon">♡</span>
+                                <span class="like-count">31</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="dream-card">
+
+                    <div class="dream-image skull">
+                        <img src="icon-skull.png" alt="Skull">
+                    </div>
+
+                    <div class="card-content">
+
+                        <div class="card-title">
+                            <h3>Skull</h3>
+                            <span>💀 Unsettling</span>
+                        </div>
+
+                        <p>
+                            A skull stared back at me from the darkness, calm and unblinking...
+                        </p>
+
+                        <div class="card-footer">
+                            <span>Yesterday</span>
+                            <button class="like-button" data-likes="16">
+                                <span class="heart-icon">♡</span>
+                                <span class="like-count">16</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- DREAM DICTIONARY -->
+
+    <section id="dictionary" class="page-section dictionary-section">
+
+        <div class="section-title-center">
+
+            <p class="small-title">DREAM DICTIONARY</p>
+
+            <h2>Discover Dream Symbols</h2>
+
+            <p>
+                Search for a symbol to discover its common interpretation.
+            </p>
+
+        </div>
+
+
+        <div class="search-box">
+
+            <span>⌕</span>
+
+            <input
+                type="text"
+                id="dictionarySearch"
+                placeholder="Search dream symbols..."
+            >
+
+        </div>
+
+
+        <div id="dictionaryGrid" class="dictionary-grid"></div>
+
+    </section>
+
+
+    <!-- SAVED DREAMS -->
+
+    <section id="saved" class="page-section saved-section">
+
+        <div class="section-title-center">
+
+            <p class="small-title">YOUR JOURNAL</p>
+
+            <h2>My Dreams</h2>
+
+            <p>
+                Dreams you save will appear here.
+            </p>
+
+        </div>
+
+
+        <div id="savedDreams" class="saved-dreams">
+
+            <div class="empty-state">
+                <div>🌙</div>
+                <h3>No dreams saved yet</h3>
+                <p>
+                    Analyze a dream and save it to create your personal dream journal.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="footer-logo">
+            ☾ Dreamscape
+        </div>
+
+        <p>
+            Explore the world hidden inside your dreams.
+        </p>
+
+        <span>
+            © 2026 Dreamscape
+        </span>
+
+    </footer>
+
+
+    <script src="env-config.js"></script>
+<script src="auth.js"></script>
+    <script src="env-config.js"></script>
+<script src="check-auth.js"></script>
+    <script src="env-config.js"></script>
+<script>
+        (async function() {
+            try {
+                const response = await fetch('http://localhost:3000/api/me', { credentials: 'include' });
+                if (response.ok) {
+                    const user = await response.json();
+                    if (user.role === 'admin') {
+                        const nav = document.getElementById('mainNav');
+                        // We just ADD the admin link instead of replacing everything
+                        const adminLink = document.createElement('a');
+                        adminLink.href = 'admin.html';
+                        adminLink.innerText = 'Admin Panel 🛠️';
+                        adminLink.style.color = '#ff7675';
+                        adminLink.style.fontWeight = 'bold';
+                        nav.insertBefore(adminLink, nav.lastElementChild);
+
+                        // Hide regular user sections only for the admin
+                        document.getElementById('analyzer').style.display = 'none';
+                        document.getElementById('dictionary').style.display = 'none';
+                        document.getElementById('saved').style.display = 'none';
+
+                        // Hide the nav links for the admin
+                        document.querySelectorAll('.nav-link').forEach(link => link.style.display = 'none');
+                    }
+                }
+            } catch (e) {
+                console.error("Auth check failed", e);
+            }
+        })();
+    </script>
+    <script src="env-config.js"></script>
+<script src="script.js"></script>
+    <script src="env-config.js"></script>
+<script src="likes.js"></script>
+
+</body>
+</html>

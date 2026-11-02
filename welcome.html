@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreamscape — Welcome</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-overlay"></div>
+
+    <main class="auth-page">
+        <div class="auth-card" style="text-align: center;">
+            <div class="result-icon" style="font-size: 3rem;">✨</div>
+            <p class="small-title">WELCOME</p>
+            <h1 class="auth-title" id="welcomeTitle">Welcome to the dream world</h1>
+            <p class="auth-subtitle" id="welcomeSubtitle">Your journey begins now...</p>
+
+            <div style="margin-top: 30px; font-size: 1.2rem; font-family: 'Inter', sans-serif; margin-bottom: 30px;">
+                Do you want to continue as <strong id="displayName">User</strong>?
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button id="yesButton" class="main-button" style="width: auto; padding: 10px 40px;">Yes</button>
+                <button id="noButton" class="secondary-button" style="width: auto; padding: 10px 40px;">No</button>
+            </div>
+        </div>
+    </main>
+
+    <footer style="margin-top: 50px;">
+        <div class="footer-logo">☾ Dreamscape</div>
+        <p>Explore the world hidden inside your dreams.</p>
+        <span>© 2026 Dreamscape</span>
+    </footer>
+
+    <script src="env-config.js"></script>
+<script src="welcome.js"></script>
+</body>
+</html>
