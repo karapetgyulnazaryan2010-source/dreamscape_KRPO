@@ -339,17 +339,15 @@
     </footer>
 
 
-    <script src="env-config.js"></script>
-<script src="auth.js"></script>
-    <script src="env-config.js"></script>
-<script src="check-auth.js"></script>
-    <script src="env-config.js"></script>
-<script>
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    <script src="check-auth.js"></script>
+    <script>
         (async function() {
             try {
-                const response = await fetch('http://localhost:3000/api/me', { credentials: 'include' });
-                if (response.ok) {
-                    const user = await response.json();
+                const r = await window.api('/api/me', { retries: 0 });
+                if (r.ok) {
+                    const user = r.data;
                     if (user.role === 'admin') {
                         const nav = document.getElementById('mainNav');
                         // We just ADD the admin link instead of replacing everything
@@ -374,9 +372,7 @@
             }
         })();
     </script>
-    <script src="env-config.js"></script>
-<script src="script.js"></script>
-    <script src="env-config.js"></script>
+    <script src="script.js"></script>
 <script src="likes.js"></script>
 
 </body>

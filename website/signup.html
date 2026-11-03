@@ -39,12 +39,13 @@
                 <label class="auth-label" for="email">Email</label>
                 <input class="auth-input" type="email" id="email" placeholder="you@example.com" required>
                 <label class="auth-label" for="password">Password</label>
-                <input class="auth-input" type="password" id="password" placeholder="Enter your password" required>
+                <input class="auth-input" type="password" id="password" placeholder="At least 8 characters" minlength="8" required>
+                <p class="form-message" id="formMessage" role="alert"></p>
                 <button type="submit" class="main-button full-width">Sign Up</button>
             </form>
             <div class="auth-divider"><span>or</span></div>
             <button type="button" class="secondary-button full-width">✦ Continue with Google</button>
-            <p class="auth-footer-text">Already have an account? <a href="login.html">Sign in here</a></p>
+            <p class="auth-footer-text">Already have an account? <a href="login.html">Log in here</a></p>
         </div>
     </main>
     <footer>
@@ -52,32 +53,7 @@
         <p>Explore the world hidden inside your dreams.</p>
         <span>© 2026 Dreamscape</span>
     </footer>
-    <script>
-        const API_BASE_URL = 'http://localhost:3000';
-        document.getElementById('signupForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/signup`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password }),
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    alert('Account Created Successfully!');
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    window.location.href = 'index.html';
-                } else {
-                    alert('ERROR: ' + (data.error || 'Signup failed'));
-                }
-            } catch (error) {
-                alert('SERVER ERROR: Check if node index.js is running');
-            }
-        });
-    </script>
+    <script src="config.js"></script>
+    <script src="signup.js"></script>
 </body>
 </html>

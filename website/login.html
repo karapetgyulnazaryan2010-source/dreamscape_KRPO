@@ -34,18 +34,17 @@
             <h1 class="auth-title">Log In to Dreamscape</h1>
             <p class="auth-subtitle">Pick up where you left off and keep exploring your dream journal.</p>
             <form class="auth-form" id="loginForm">
-                <label class="auth-label" for="name">Full Name</label>
-                <input class="auth-input" type="text" id="name" name="name" placeholder="Your name" required>
                 <label class="auth-label" for="email">Email</label>
                 <input class="auth-input" type="email" id="email" name="email" placeholder="you@example.com" required>
                 <label class="auth-label" for="password">Password</label>
                 <input class="auth-input" type="password" id="password" name="password" placeholder="Enter your password" required>
                 <a href="#" class="auth-forgot">Forgot password?</a>
+                <p class="form-message" id="formMessage" role="alert"></p>
                 <button type="submit" class="main-button full-width">Log In</button>
             </form>
             <div class="auth-divider"><span>or</span></div>
             <button type="button" class="secondary-button full-width">✦ Continue with Google</button>
-            <p class="auth-footer-text">Already have an account? <a href="signup.html">Sign in here</a></p>
+            <p class="auth-footer-text">Don't have an account? <a href="signup.html">Sign up here</a></p>
         </div>
     </main>
     <footer>
@@ -53,31 +52,7 @@
         <p>Explore the world hidden inside your dreams.</p>
         <span>© 2026 Dreamscape</span>
     </footer>
-    <script>
-        const API_BASE_URL = 'http://localhost:3000';
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/signin`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password }),
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    alert('Login Successful!');
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    window.location.href = 'index.html';
-                } else {
-                    alert('ERROR: ' + (data.error || 'Login failed'));
-                }
-            } catch (error) {
-                alert('SERVER ERROR: Check if node index.js is running');
-            }
-        });
-    </script>
+    <script src="config.js"></script>
+    <script src="login.js"></script>
 </body>
 </html>

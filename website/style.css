@@ -2224,3 +2224,9 @@ footer span {
 
     margin-top: 0;
 }
+
+/* Login / signup status message */
+.form-message { min-height: 1.2em; margin: 4px 0 0; font-size: 0.9rem; text-align: center; }
+.form-message.error { color: #ff7675; }
+.form-message.info { color: #b8b5d9; }
+.main-button:disabled { opacity: 0.6; cursor: wait; }
