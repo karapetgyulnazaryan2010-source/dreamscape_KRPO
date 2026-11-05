@@ -28,7 +28,7 @@
             });
             if (r.ok) {
                 localStorage.setItem('user', JSON.stringify(r.data.user));
-                window.location.href = 'index.html';
+                window.location.href = 'welcome.html';
             } else {
                 show((r.data && r.data.error) || 'Signup failed', true);
                 button.disabled = false;

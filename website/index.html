@@ -348,6 +348,8 @@
                 const r = await window.api('/api/me', { retries: 0 });
                 if (r.ok) {
                     const user = r.data;
+                    const authLink = document.getElementById("authLink");
+                    if (authLink) { authLink.textContent = "👤 " + user.name; authLink.href = "profile.html"; }
                     if (user.role === 'admin') {
                         const nav = document.getElementById('mainNav');
                         // We just ADD the admin link instead of replacing everything
