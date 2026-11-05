@@ -53,8 +53,18 @@ async function loadUsers() {
             del.textContent = 'Delete';
             del.addEventListener('click', function () { deleteUser(user.id); });
 
+            var reset = document.createElement('button');
+            reset.className = 'reset-btn';
+            reset.textContent = 'Reset password';
+            reset.addEventListener('click', function () { resetPassword(user); });
+
+            var actions = document.createElement('div');
+            actions.className = 'user-actions';
+            actions.appendChild(reset);
+            actions.appendChild(del);
+
             item.appendChild(info);
-            item.appendChild(del);
+            item.appendChild(actions);
             listElement.appendChild(item);
         });
     } catch (error) {
@@ -71,6 +81,20 @@ async function deleteUser(id) {
             loadUsers();
         } else {
             alert((r.data && r.data.error) || 'Failed to delete user.');
+        }
+    } catch (error) {
+        alert('Error connecting to server.');
+    }
+}
+
+async function resetPassword(user) {
+    if (!confirm('Give ' + user.email + ' a new temporary password? Their old password will stop working.')) return;
+    try {
+        var r = await window.api('/api/admin/user/' + user.id + '/reset-password', { method: 'POST', retries: 0 });
+        if (r.ok) {
+            alert('Temporary password for ' + user.email + ':\n\n' + r.data.password + '\n\nGive it to the person. It is shown only once.');
+        } else {
+            alert((r.data && r.data.error) || 'Failed to reset password.');
         }
     } catch (error) {
         alert('Error connecting to server.');

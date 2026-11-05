@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreamscape — Choose a new password</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-overlay"></div>
+    <header class="navbar">
+        <div class="logo" style="cursor: pointer;" onclick="window.location.href='index.html'">
+            <div class="logo-moon">☾</div>
+            <div>
+                <h2>Dreamscape</h2>
+                <span>Explore your dreams</span>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="index.html#analyzer">Interpret dreams</a>
+            <a href="index.html#dictionary">DreamDictionary</a>
+            <a href="index.html#saved">My Dreams</a>
+            <a href="#" class="active">Profile</a>
+        </nav>
+    </header>
+    <main class="auth-page">
+        <div class="auth-card">
+            <div class="result-icon">☾</div>
+            <p class="small-title">NEW PASSWORD</p>
+            <h1 class="auth-title">Choose a new password</h1>
+            <p class="auth-subtitle">Type a new password for your account (at least 8 characters).</p>
+            <form class="auth-form" id="resetForm">
+                <label class="auth-label" for="password">New password</label>
+                <input class="auth-input" type="password" id="password" name="password" placeholder="At least 8 characters" minlength="8" required>
+                <label class="auth-label" for="password2">Repeat new password</label>
+                <input class="auth-input" type="password" id="password2" name="password2" placeholder="Repeat the password" minlength="8" required>
+                <p class="form-message" id="formMessage" role="alert"></p>
+                <button type="submit" class="main-button full-width">Save new password</button>
+            </form>
+            <p class="auth-footer-text"><a href="login.html">Back to log in</a></p>
+        </div>
+    </main>
+    <footer>
+        <div class="footer-logo">☾ Dreamscape</div>
+        <p>Explore the world hidden inside your dreams.</p>
+        <span>© 2026 Dreamscape</span>
+    </footer>
+    <script src="config.js"></script>
+    <script src="reset.js"></script>
+</body>
+</html>

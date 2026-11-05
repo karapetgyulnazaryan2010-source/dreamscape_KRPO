@@ -3,6 +3,7 @@ const session = require('express-session');
 const PgSession = require('connect-pg-simple')(session);
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const { pool, init } = require('./db');
 
 const app = express();
@@ -133,6 +134,102 @@ app.delete('/api/admin/user/:id', requireAdmin, wrap(async (req, res) => {
     if (id === req.session.user.id) return res.status(400).json({ error: 'You cannot delete yourself' });
     await pool.query('DELETE FROM users WHERE id = $1', [id]);
     res.json({ success: true });
+}));
+
+
+// ---- Password reset ----
+const siteUrl = allowedOrigins[0];
+const sha256 = v => crypto.createHash('sha256').update(v).digest('hex');
+
+const hits = new Map(); // tiny in-memory rate limiter
+function limited(key, max, windowMs) {
+    const now = Date.now();
+    const list = (hits.get(key) || []).filter(t => now - t < windowMs);
+    list.push(now);
+    hits.set(key, list);
+    return list.length > max;
+}
+
+async function sendResetEmail(to, link) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key) {
+        // No email service set up: the owner can copy the link from the Render Logs.
+        console.log(`[password reset] No RESEND_API_KEY set. Reset link for ${to}: ${link}`);
+        return;
+    }
+    const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            from: process.env.EMAIL_FROM || 'Dreamscape <onboarding@resend.dev>',
+            to: [to],
+            subject: 'Reset your Dreamscape password',
+            html: `<p>Someone asked to reset your Dreamscape password.</p>
+                   <p><a href="${link}">Click here to choose a new password</a> (valid for 30 minutes).</p>
+                   <p>If this was not you, ignore this email.</p>`
+        })
+    });
+    if (!res.ok) {
+        console.error('Email service error:', res.status, await res.text());
+        console.log(`[password reset] Email could not be sent. Reset link for ${to}: ${link}`);
+    }
+}
+
+app.post('/api/forgot-password', wrap(async (req, res) => {
+    const email = String(req.body.email || '').trim().toLowerCase();
+    if (!emailOk(email)) return res.status(400).json({ error: 'Please enter a valid email' });
+    if (limited('fp:' + email, 3, 15 * 60 * 1000) || limited('fp:all', 100, 15 * 60 * 1000)) {
+        return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+    }
+
+    const { rows } = await pool.query('SELECT id, email FROM users WHERE email = $1', [email]);
+    if (rows[0]) {
+        const token = crypto.randomBytes(32).toString('hex');
+        await pool.query('DELETE FROM password_resets WHERE user_id = $1', [rows[0].id]);
+        await pool.query(
+            "INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES ($1, $2, NOW() + INTERVAL '30 minutes')",
+            [rows[0].id, sha256(token)]
+        );
+        try {
+            await sendResetEmail(rows[0].email, `${siteUrl}/reset.html?token=${token}`);
+        } catch (err) {
+            console.error('Could not send reset email:', err.message);
+        }
+    }
+    // Same answer whether or not the account exists
+    res.json({ success: true });
+}));
+
+app.post('/api/reset-password', wrap(async (req, res) => {
+    const token = String(req.body.token || '');
+    const password = String(req.body.password || '');
+    if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+
+    const { rows } = await pool.query(
+        'SELECT user_id FROM password_resets WHERE token_hash = $1 AND expires_at > NOW()',
+        [sha256(token)]
+    );
+    if (!rows[0]) return res.status(400).json({ error: 'This link is invalid or has expired. Ask for a new one.' });
+
+    const hash = await bcrypt.hash(password, 10);
+    await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hash, rows[0].user_id]);
+    await pool.query('DELETE FROM password_resets WHERE user_id = $1', [rows[0].user_id]);
+    await pool.query("DELETE FROM session WHERE sess->'user'->>'id' = $1", [String(rows[0].user_id)]);
+    res.json({ success: true });
+}));
+
+// Admin gives someone a temporary password (for people who cannot use email)
+app.post('/api/admin/user/:id/reset-password', requireAdmin, wrap(async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isInteger(id)) return res.status(400).json({ error: 'Bad id' });
+    const alphabet = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789';
+    let temp = '';
+    for (let i = 0; i < 10; i++) temp += alphabet[crypto.randomInt(alphabet.length)];
+    const hash = await bcrypt.hash(temp, 10);
+    const { rowCount } = await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hash, id]);
+    if (!rowCount) return res.status(404).json({ error: 'User not found' });
+    await pool.query("DELETE FROM session WHERE sess->'user'->>'id' = $1", [String(id)]);
+    res.json({ success: true, password: temp });
 }));
 
 app.use((err, req, res, next) => {
