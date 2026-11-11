@@ -28,6 +28,9 @@ app.use(cors({
 
 app.use(express.json({ limit: '100kb' }));
 
+// Never let a browser or proxy keep an old answer (login state must always be fresh)
+app.use('/api', (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
+
 if (isProd && !process.env.SESSION_SECRET) {
     console.warn('WARNING: SESSION_SECRET is not set. Set it in Render -> Environment.');
 }

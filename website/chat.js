@@ -79,7 +79,7 @@
                 window.location.href = 'login.html';
                 return;
             } else {
-                errorBubble((r.data && r.data.error) || 'Something went wrong.');
+                errorBubble((r.data && r.data.error) || 'The server is waking up or busy. Please press "Try again" in a few seconds.');
             }
         } catch (e) {
             t.remove();

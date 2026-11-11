@@ -8,6 +8,17 @@
     var pending = sessionStorage.getItem('pendingDream');
     if (pending && !input.value) input.value = pending;
 
+    function notice(text) {
+        var el = document.getElementById('decodeNotice');
+        if (!el) {
+            el = document.createElement('p');
+            el.id = 'decodeNotice';
+            el.style.cssText = 'margin-top:10px;font-size:.9rem;color:#c4b5fd;text-align:center;';
+            button.insertAdjacentElement('afterend', el);
+        }
+        el.textContent = text;
+    }
+
     function showLoginOverlay() {
         var overlay = document.getElementById('loginOverlay');
         if (!overlay) { window.location.href = 'login.html'; return; }
@@ -28,6 +39,7 @@
         }
 
         button.disabled = true;
+        notice('');
         sessionStorage.setItem('pendingDream', text);
         try {
             var r = await window.api('/api/me', { retries: 3 });
@@ -36,9 +48,13 @@
                 window.location.href = 'chat.html';
                 return;
             }
-            showLoginOverlay();
+            if (r.status === 401) {
+                showLoginOverlay();            // really not logged in
+            } else {
+                notice('The server is waking up. Please wait a few seconds and press the button again.');
+            }
         } catch (err) {
-            showLoginOverlay();
+            notice('Could not reach the server. Please try again in a moment.');
         }
         button.disabled = false;
     }, true);
