@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreamscape — Dream Guide</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-overlay"></div>
+    <header class="navbar">
+        <div class="logo" style="cursor: pointer;" onclick="window.location.href='index.html'">
+            <div class="logo-moon">☾</div>
+            <div>
+                <h2>Dreamscape</h2>
+                <span>Explore your dreams</span>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="index.html#analyzer">Interpret dreams</a>
+            <a href="index.html#dictionary">DreamDictionary</a>
+            <a href="index.html#saved">My Dreams</a>
+            <a href="#" class="active">Profile</a>
+        </nav>
+    </header>
+    <main class="chat-page">
+        <div class="chat-card">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <div class="chat-moon">☾</div>
+                    <div>
+                        <h1>Dream Guide</h1>
+                        <p>Let's explore your dream together</p>
+                    </div>
+                </div>
+                <button type="button" id="newChatButton" class="chat-new">+ New dream</button>
+            </div>
+
+            <div id="chatMessages" class="chat-messages" aria-live="polite"></div>
+
+            <p class="chat-notice">✦ Interpretations are symbolic ideas for self-reflection, not predictions. Your messages are processed by an AI service, so please don't share personal details like your full name, address or phone number.</p>
+
+            <form id="chatForm" class="chat-form">
+                <textarea id="chatInput" rows="1" maxlength="1000" placeholder="Write your message... (Enter to send, Shift+Enter for a new line)"></textarea>
+                <button type="submit" id="sendButton" class="chat-send">Send</button>
+            </form>
+        </div>
+    </main>
+    <footer>
+        <div class="footer-logo">☾ Dreamscape</div>
+        <p>Explore the world hidden inside your dreams.</p>
+        <span>© 2026 Dreamscape</span>
+    </footer>
+    <script src="config.js"></script>
+    <script src="chat.js"></script>
+</body>
+</html>

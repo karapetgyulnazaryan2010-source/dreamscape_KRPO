@@ -137,9 +137,141 @@ app.delete('/api/admin/user/:id', requireAdmin, wrap(async (req, res) => {
 }));
 
 
+// ---- AI dream guide ----
+const DREAM_GUIDE_PROMPT = `You are Dream Guide, the friendly dream-interpretation companion inside the Dreamscape dream journal website. You help the user explore what their dream might mean.
+
+Rules:
+- Always reply in the same language the user writes in (Armenian, Russian, English, or any other).
+- When the user shares a new dream: give a warm, clear interpretation. Name the 2 to 4 main symbols or feelings, explain what they commonly stand for (from cultural and psychological perspectives), connect them into a short story of what the dream might be saying, then ask ONE gentle follow-up question about what is happening in the person's real life or how they felt.
+- In later messages, answer what they ask, build on what they told you, and keep the conversation natural.
+- Make it clear, in a light way, that interpretations are symbolic ideas for self-reflection and not facts or predictions. Never predict the future and never diagnose anything.
+- If the user seems to be in distress, or mentions self-harm or wanting to die, respond with warmth, take it seriously, encourage them to talk to a trusted person or local emergency or crisis services, and do not interpret the dream in that message.
+- Many users are students, so keep everything age-appropriate. Stay on dreams and gentle self-reflection; if asked about unrelated things, kindly steer back.
+- Keep replies under about 250 words. Use plain text and short paragraphs, no markdown headings. You may use a few emojis such as ☾ or ✦ sparingly.`;
+
+const dailyChat = { day: '', count: 0 };
+
+function httpError(status, message) {
+    const e = new Error(message);
+    e.status = status;
+    e.userMessage = message;
+    return e;
+}
+
+// Free option: Google Gemini (key from aistudio.google.com)
+async function askGemini(messages, signal) {
+    const model = process.env.GEMINI_MODEL || 'gemini-flash-latest';
+    const base = process.env.GEMINI_API_URL || 'https://generativelanguage.googleapis.com/v1beta';
+    const r = await fetch(`${base}/models/${encodeURIComponent(model)}:generateContent`, {
+        method: 'POST',
+        headers: { 'x-goog-api-key': process.env.GEMINI_API_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            systemInstruction: { parts: [{ text: DREAM_GUIDE_PROMPT }] },
+            contents: messages.map(m => ({
+                role: m.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: m.content }]
+            })),
+            generationConfig: { maxOutputTokens: 2048, temperature: 0.8 }
+        }),
+        signal
+    });
+    const data = await r.json().catch(() => null);
+    if (r.status === 429) {
+        console.error('Gemini quota reached:', JSON.stringify(data).slice(0, 300));
+        throw httpError(429, 'The Dream Guide is very busy right now. Please try again in a minute.');
+    }
+    if (!r.ok || !data) {
+        console.error('Gemini error:', r.status, JSON.stringify(data).slice(0, 400));
+        throw httpError(500, 'The Dream Guide is resting for a moment. Please try again.');
+    }
+    const cand = (data.candidates || [])[0];
+    const text = ((cand && cand.content && cand.content.parts) || []).map(p => p.text || '').join('').trim();
+    if (!text) {
+        console.error('Gemini gave no text:', JSON.stringify(data.promptFeedback || {}), cand && cand.finishReason);
+        throw httpError(500, 'The Dream Guide could not answer that. Try describing your dream in other words.');
+    }
+    return text;
+}
+
+// Optional: Claude (needs paid credit at console.anthropic.com)
+async function askClaude(messages, signal) {
+    const r = await fetch(process.env.ANTHROPIC_API_URL || 'https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+            'x-api-key': process.env.ANTHROPIC_API_KEY,
+            'anthropic-version': '2023-06-01',
+            'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+            model: process.env.ANTHROPIC_MODEL || 'claude-haiku-5-5',
+            max_tokens: 700,
+            system: DREAM_GUIDE_PROMPT,
+            messages
+        }),
+        signal
+    });
+    const data = await r.json().catch(() => null);
+    if (!r.ok || !data) {
+        console.error('Claude error:', r.status, JSON.stringify(data).slice(0, 300));
+        throw httpError(500, 'The Dream Guide is resting for a moment. Please try again.');
+    }
+    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+    if (!text) throw httpError(500, 'The Dream Guide had no answer. Please try again.');
+    return text;
+}
+
+app.post('/api/chat', requireLogin, wrap(async (req, res) => {
+    const provider = process.env.GEMINI_API_KEY ? 'gemini' : (process.env.ANTHROPIC_API_KEY ? 'claude' : null);
+    if (!provider) return res.status(500).json({ error: 'The Dream Guide is not set up yet.' });
+
+    // Clean the conversation sent by the browser
+    let msgs = Array.isArray(req.body.messages) ? req.body.messages : [];
+    msgs = msgs
+        .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
+        .map(m => ({ role: m.role, content: m.content.trim().slice(0, 2000) }))
+        .slice(-20);
+    while (msgs.length && msgs[0].role !== 'user') msgs.shift();
+    const clean = [];
+    for (const m of msgs) {
+        const last = clean[clean.length - 1];
+        if (last && last.role === m.role) last.content += '\n' + m.content;
+        else clean.push({ role: m.role, content: m.content });
+    }
+    if (!clean.length || clean[clean.length - 1].role !== 'user') {
+        return res.status(400).json({ error: 'Please write a message first.' });
+    }
+
+    // Limits, so nobody can use up the free quota (or run up a bill)
+    if (limited('chat:' + req.session.user.id, 20, 10 * 60 * 1000)) {
+        return res.status(429).json({ error: 'You are sending messages very fast. Please wait a few minutes.' });
+    }
+    const today = new Date().toISOString().slice(0, 10);
+    if (dailyChat.day !== today) { dailyChat.day = today; dailyChat.count = 0; }
+    const dailyMax = parseInt(process.env.CHAT_DAILY_LIMIT || '300', 10);
+    if (dailyChat.count >= dailyMax) {
+        return res.status(429).json({ error: 'The Dream Guide has reached its limit for today. Please come back tomorrow.' });
+    }
+    dailyChat.count++;
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 60000);
+    try {
+        const reply = provider === 'gemini'
+            ? await askGemini(clean, controller.signal)
+            : await askClaude(clean, controller.signal);
+        res.json({ reply });
+    } catch (err) {
+        if (err.status) return res.status(err.status).json({ error: err.userMessage });
+        console.error('AI request failed:', err.message);
+        res.status(500).json({ error: 'The Dream Guide is resting for a moment. Please try again.' });
+    } finally {
+        clearTimeout(timer);
+    }
+}));
+
 // ---- Likes ----
 function requireLogin(req, res, next) {
-    if (!req.session.user) return res.status(401).json({ error: 'Please log in to like dreams.' });
+    if (!req.session.user) return res.status(401).json({ error: 'Please log in first.' });
     next();
 }
 const postIdOk = id => /^[a-z0-9-]{1,50}$/.test(id);
