@@ -137,6 +137,46 @@ app.delete('/api/admin/user/:id', requireAdmin, wrap(async (req, res) => {
 }));
 
 
+// ---- Likes ----
+function requireLogin(req, res, next) {
+    if (!req.session.user) return res.status(401).json({ error: 'Please log in to like dreams.' });
+    next();
+}
+const postIdOk = id => /^[a-z0-9-]{1,50}$/.test(id);
+
+// Public: how many likes each post has, plus which ones the logged-in person liked
+app.get('/api/likes', wrap(async (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    const counts = {};
+    const all = await pool.query('SELECT post_id, COUNT(*)::int AS n FROM likes GROUP BY post_id');
+    all.rows.forEach(r => { counts[r.post_id] = r.n; });
+    let liked = [];
+    if (req.session.user) {
+        const mine = await pool.query('SELECT post_id FROM likes WHERE user_id = $1', [req.session.user.id]);
+        liked = mine.rows.map(r => r.post_id);
+    }
+    res.json({ counts, liked });
+}));
+
+app.post('/api/likes/:postId', requireLogin, wrap(async (req, res) => {
+    const postId = req.params.postId;
+    if (!postIdOk(postId)) return res.status(400).json({ error: 'Bad post id' });
+    await pool.query(
+        'INSERT INTO likes (user_id, post_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+        [req.session.user.id, postId]
+    );
+    const { rows } = await pool.query('SELECT COUNT(*)::int AS n FROM likes WHERE post_id = $1', [postId]);
+    res.json({ success: true, liked: true, count: rows[0].n });
+}));
+
+app.delete('/api/likes/:postId', requireLogin, wrap(async (req, res) => {
+    const postId = req.params.postId;
+    if (!postIdOk(postId)) return res.status(400).json({ error: 'Bad post id' });
+    await pool.query('DELETE FROM likes WHERE user_id = $1 AND post_id = $2', [req.session.user.id, postId]);
+    const { rows } = await pool.query('SELECT COUNT(*)::int AS n FROM likes WHERE post_id = $1', [postId]);
+    res.json({ success: true, liked: false, count: rows[0].n });
+}));
+
 // ---- Password reset ----
 const siteUrl = allowedOrigins[0];
 const sha256 = v => crypto.createHash('sha256').update(v).digest('hex');

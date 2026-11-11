@@ -25,6 +25,14 @@ async function init() {
         )
     `);
     await pool.query(`
+        CREATE TABLE IF NOT EXISTS likes (
+            user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            post_id    TEXT NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            PRIMARY KEY (user_id, post_id)
+        )
+    `);
+    await pool.query(`
         CREATE TABLE IF NOT EXISTS password_resets (
             id         SERIAL PRIMARY KEY,
             user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
